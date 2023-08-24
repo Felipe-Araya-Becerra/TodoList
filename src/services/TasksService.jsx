@@ -11,7 +11,7 @@ const DELETE_TASK_BASE_API_URL = "http://localhost:8080/api/v1/delete"
 
 class TaskService{
 
-  gelAllTasks(){
+  getAllTasks(){
     return axios.get(TASKS_BASE_API_URL)
   }
 
@@ -20,7 +20,7 @@ class TaskService{
   }
 
   getTaskById(taskId){
-    return axios.get(TASKS_BASE_API_URL +'/',taskId)
+    return axios.get(TASKS_BASE_API_URL +'/'+taskId)
   }
 
   updateTask(taskId,task){

@@ -6,11 +6,11 @@ const ListTasksComponent = () => {
   const [task, setTasks] = useState([]);
 
   useEffect(() => {
-    ListTasks()
+    ListTasks();
   }, []);
 
-  const ListTasks = () =>{
-    TasksService.gelAllTasks()
+  const ListTasks = () => {
+    TasksService.getAllTasks()
       .then((response) => {
         setTasks(response.data);
         console.log(response.data);
@@ -18,20 +18,25 @@ const ListTasksComponent = () => {
       .catch((error) => {
         console.log(error);
       });
-  }
+  };
 
-  const deleteTask = (taskId)=>{
-    TasksService.deleteTask(taskId).then(response => {
-      ListTasks()
-    }).catch(error => {
-      console.log(error)
-    })
-  }
+  const deleteTask = (taskId) => {
+    TasksService.deleteTask(taskId)
+      .then((response) => {
+        ListTasks();
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
 
   return (
     <div className="container">
       <h2 className="text-center">Lista de tareas</h2>
-      <Link to='addTask' className="btn btn-primary mb-2"> Agregar tarea</Link>
+      <Link to="addTask" className="btn btn-primary mb-2">
+        {" "}
+        Agregar tarea
+      </Link>
       <table className="table table-bordered table-striped">
         <thead>
           <th>ID</th>
@@ -46,10 +51,17 @@ const ListTasksComponent = () => {
               <td>{task.title}</td>
               <td>{task.description}</td>
               <td>
-                <Link className="btn btn-info" to={`updateTask/${task.id}`}>Actualizar</Link>
+                <Link className="btn btn-info" to={`updateTask/${task.id}`}>
+                  Actualizar
+                </Link>
               </td>
               <td>
-                <button className="btn btn-danger" onClick={()=> deleteTask(task.id)}>Eliminar</button>
+                <button
+                  className="btn btn-danger"
+                  onClick={() => deleteTask(task.id)}
+                >
+                  Eliminar
+                </button>
               </td>
             </tr>
           ))}

@@ -3,39 +3,74 @@ import TasksService from "../services/TasksService";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
 function AddTaskComponent() {
+  
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const navigate = useNavigate()
-  const {id} = useParams();
+  const navigate = useNavigate();
+  const { id } = useParams();
+  const [errors, setErrors] = useState({});
 
-
-  const saveTask = (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    const task = { title, description };
-    TasksService.createTask(task).then(response => {
-      console.log(response.data)
-      navigate('/')
-    }).catch(error => {
-      console.log(error)
-    })
+    const validationErrors = {};
+    if (!title.trim()) {
+      validationErrors.title = "Title is required";
+    }
+    if (!description.trim()) {
+      validationErrors.description = "description is required is required";
+    }
+
+    setErrors(validationErrors);
+
+    if (Object.keys(validationErrors).length === 0) {
+      alert("Tarea creada con exito");
+    }
   };
 
-  useEffect(()=>{
-    TasksService.getTaskById(id).then(response =>{
-      setTitle(response.data.title);
-      setDescription(response.data.description)
-    }).catch(error => {
-      console.log(error)
-    })
-  })
+  const saveOrUpdateTask = (e) => {
+    e.preventDefault();
+    const task = { title, description };
 
-  const pageTitle = () =>{
-    if(id){
-      return <h2 className="text-center">Actualizar Tarea</h2>
-    }else{
-      return <h2 className="text-center">Agregar Tarea</h2>
+    if (id) {
+      TasksService.updateTask(id, task)
+        .then((response) => {
+          console.log(response.data);
+          navigate("/");
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    } else {
+      TasksService.createTask(task)
+        .then((response) => {
+          console.log(response.data);
+          navigate("/");
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     }
-  }
+  };
+
+  useEffect(() => {
+    TasksService.getTaskById(id)
+      .then((response) => {
+        setTitle(response.data.title);
+        console.log(title);
+        setDescription(response.data.description);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }, []);
+
+  const pageTitle = () => {
+    if (id) {
+      return <h2 className="text-center">Actualizar Tarea</h2>;
+    } else {
+      return <h2 className="text-center">Agregar Tarea</h2>;
+    }
+  };
   return (
     <div>
       <div className="container">
@@ -43,7 +78,7 @@ function AddTaskComponent() {
           <div className="card col-md-6 offset-md-3 offset-md-3">
             <h1 className="text-center">{pageTitle()}</h1>
             <div className="card-body">
-              <form action="">
+              <form onSubmit={handleSubmit}>
                 <div className="form-group mb-2">
                   <label className="form-label">Title: </label>
                   <input
@@ -51,11 +86,12 @@ function AddTaskComponent() {
                     placeholder="Introduzca un titulo"
                     name="title"
                     className="form-control"
+                    autoComplete="off"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                   />
+                  {errors.title && <span>{errors.title}</span>}
                 </div>
-
                 <div className="form-group mb-2">
                   <label className="form-label">Description: </label>
                   <input
@@ -63,21 +99,22 @@ function AddTaskComponent() {
                     placeholder="Introduzca una descripcion"
                     name="description"
                     className="form-control"
+                    autoComplete="off"
+                    required="true"
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                   />
+                  {errors.description && <span>{errors.description}</span>}
                 </div>
                 <button
                   className="btn btn-success"
-                  onClick={(e) => saveTask(e)}
+                  type="submit"
+                  onClick={(e) => saveOrUpdateTask(e)}
                 >
                   Enviar
                 </button>
                 &nbsp;&nbsp;
-                <Link
-                  className="btn btn-danger"
-                  to = '/'
-                >
+                <Link className="btn btn-danger" to="/">
                   Cancelar
                 </Link>
               </form>
